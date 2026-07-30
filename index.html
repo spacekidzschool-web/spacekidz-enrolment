@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpaceKidz Preschool — Online Enrolment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#1F5C99;
+    --navy-dark:#144066;
+    --orange:#F5821F;
+    --teal:#3FBFC0;
+    --purple:#6C4FA1;
+    --green:#4CAF6A;
+    --bg:#F7F9FC;
+    --card:#FFFFFF;
+    --ink:#1E2430;
+    --muted:#647085;
+    --line:#E1E7F0;
+    --danger:#D64545;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Inter',sans-serif; line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{ font-family:'Poppins',sans-serif; margin:0 0 8px; }
+  .wrap{ max-width:820px; margin:0 auto; padding:28px 18px 80px; }
+
+  /* Header */
+  .topbar{ display:flex; align-items:center; gap:14px; padding:18px 0 6px; }
+  .topbar svg{ height:40px; width:auto; flex-shrink:0; }
+  .topbar .brand-text{ font-family:'Poppins',sans-serif; font-weight:800; font-size:22px; letter-spacing:.5px; }
+  .topbar .brand-text span{ color:var(--orange); }
+  .topbar .tag{ font-size:12px; color:var(--muted); margin-top:-2px; }
+
+  .hero{ margin:18px 0 26px; }
+  .hero h1{ font-size:26px; color:var(--navy-dark); }
+  .hero p{ color:var(--muted); font-size:15px; max-width:60ch; }
+
+  /* Progress rail */
+  .rail{ position:relative; margin:26px 0 34px; }
+  .rail-track{ position:absolute; top:17px; left:17px; right:17px; height:4px; background:var(--line); border-radius:2px; z-index:0; }
+  .rail-fill{ position:absolute; top:17px; left:17px; height:4px; background:linear-gradient(90deg,var(--navy),var(--teal)); border-radius:2px; z-index:1; transition:width .35s ease; }
+  .rail-steps{ position:relative; z-index:2; display:flex; justify-content:space-between; }
+  .rail-step{ display:flex; flex-direction:column; align-items:center; gap:6px; flex:1; }
+  .rail-dot{ width:34px; height:34px; border-radius:50%; background:#fff; border:2px solid var(--line); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; color:var(--muted); transition:all .25s ease; }
+  .rail-step.active .rail-dot{ border-color:var(--navy); color:var(--navy); background:#EAF1FA; }
+  .rail-step.done .rail-dot{ border-color:var(--green); background:var(--green); color:#fff; }
+  .rail-label{ font-size:10.5px; color:var(--muted); text-align:center; max-width:70px; display:none; }
+  @media(min-width:640px){ .rail-label{ display:block; } }
+
+  /* Card / step panel */
+  .card{ background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:26px 24px; box-shadow:0 2px 10px rgba(20,64,102,.05); }
+  .step{ display:none; animation:fadeIn .3s ease; }
+  .step.active{ display:block; }
+  @keyframes fadeIn{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+
+  .step h2{ color:var(--navy-dark); font-size:19px; display:flex; align-items:center; gap:8px;}
+  .step .step-sub{ color:var(--muted); font-size:13.5px; margin-bottom:18px; }
+
+  fieldset{ border:1px solid var(--line); border-radius:10px; padding:16px 16px 6px; margin:0 0 18px; }
+  legend{ font-family:'Poppins',sans-serif; font-weight:700; font-size:13.5px; color:var(--navy); padding:0 6px; }
+
+  .grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .grid.cols-3{ grid-template-columns:1fr 1fr 1fr; }
+  @media(max-width:600px){ .grid, .grid.cols-3{ grid-template-columns:1fr; } }
+
+  label{ display:block; font-size:13px; font-weight:600; color:var(--ink); margin-bottom:5px; }
+  label .req{ color:var(--danger); }
+  input[type=text],input[type=email],input[type=tel],input[type=date],input[type=number],select,textarea{
+    width:100%; padding:10px 12px; border:1.5px solid var(--line); border-radius:8px;
+    font-family:'Inter',sans-serif; font-size:14px; color:var(--ink); background:#fff;
+    transition:border-color .15s ease;
+  }
+  input:focus,select:focus,textarea:focus{ outline:none; border-color:var(--navy); }
+  textarea{ resize:vertical; min-height:64px; }
+  .field{ margin-bottom:14px; }
+
+  .check-row{ display:flex; align-items:flex-start; gap:9px; padding:8px 0; }
+  .check-row input[type=checkbox],.check-row input[type=radio]{ margin-top:3px; width:17px; height:17px; accent-color:var(--navy); flex-shrink:0; }
+  .check-row label{ font-weight:500; font-size:13.5px; margin:0; }
+  .check-grid{ display:grid; grid-template-columns:1fr 1fr; gap:2px 18px; }
+  @media(max-width:600px){ .check-grid{ grid-template-columns:1fr; } }
+
+  .repeat-block{ border:1px dashed var(--line); border-radius:10px; padding:14px; margin-bottom:12px; position:relative; }
+  .repeat-block .rm{ position:absolute; top:10px; right:10px; background:none; border:none; color:var(--danger); font-size:12px; font-weight:700; cursor:pointer; }
+  .add-btn{ background:#EAF1FA; color:var(--navy); border:1.5px dashed var(--navy); border-radius:8px; padding:9px 14px; font-weight:700; font-size:13px; cursor:pointer; }
+  .add-btn:hover{ background:#DCE9F8; }
+
+  /* Agreement text */
+  .agreement-box{ max-height:340px; overflow-y:auto; border:1.5px solid var(--line); border-radius:10px; padding:16px 18px; background:#FCFDFE; font-size:13.5px; }
+  .agreement-box h3{ font-size:14px; color:var(--navy-dark); margin:16px 0 6px; }
+  .agreement-box h3:first-child{ margin-top:0; }
+  .agreement-box p{ margin:0 0 8px; color:#3A4557; }
+  .agreement-box .clause-num{ font-weight:700; color:var(--navy); }
+  .agreement-box ul{ margin:4px 0 10px 18px; padding:0; }
+  .agreement-box .highlight{ background:#FFF3E4; border-left:3px solid var(--orange); padding:8px 10px; border-radius:6px; margin:8px 0; }
+
+  .consent-block{ background:#EFF6EE; border:1.5px solid #CDE6CB; border-radius:10px; padding:14px 16px; margin-top:16px; }
+  .consent-block.warn{ background:#FFF3E4; border-color:#F5D6AE; }
+
+  /* Signature pad */
+  .sig-wrap{ border:1.5px solid var(--line); border-radius:10px; overflow:hidden; background:#fff; }
+  canvas.sigpad{ display:block; width:100%; height:160px; touch-action:none; cursor:crosshair; background:#fdfdfd; }
+  .sig-tools{ display:flex; justify-content:space-between; align-items:center; padding:8px 10px; background:#F5F8FC; border-top:1px solid var(--line); }
+  .sig-tools button{ background:none; border:none; color:var(--navy); font-weight:700; font-size:12.5px; cursor:pointer; }
+  .sig-hint{ font-size:12px; color:var(--muted); }
+
+  /* File upload */
+  .file-row{ border:1.5px dashed var(--line); border-radius:10px; padding:12px 14px; display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; }
+  .file-row .file-name{ font-size:13px; font-weight:600; }
+  .file-row .file-status{ font-size:12px; color:var(--muted); }
+  .file-row input[type=file]{ font-size:12.5px; max-width:180px; }
+
+  /* Nav buttons */
+  .nav-row{ display:flex; justify-content:space-between; align-items:center; margin-top:24px; gap:12px; }
+  .btn{ font-family:'Inter',sans-serif; font-weight:700; font-size:14px; border-radius:9px; padding:12px 22px; cursor:pointer; border:none; transition:transform .1s ease, opacity .15s ease; }
+  .btn:active{ transform:scale(.97); }
+  .btn-primary{ background:var(--navy); color:#fff; }
+  .btn-primary:hover{ background:var(--navy-dark); }
+  .btn-ghost{ background:none; color:var(--navy); border:1.5px solid var(--line); }
+  .btn-ghost:hover{ border-color:var(--navy); }
+  .btn:disabled{ opacity:.45; cursor:not-allowed; }
+  .btn-submit{ background:var(--orange); color:#fff; }
+  .btn-submit:hover{ background:#DC7315; }
+
+  .error-msg{ color:var(--danger); font-size:12.5px; margin-top:4px; display:none; }
+  .invalid .error-msg{ display:block; }
+  .field.invalid input,.field.invalid select,.field.invalid textarea{ border-color:var(--danger); }
+  .check-row.invalid,fieldset.invalid,.consent-block.invalid{ outline:1.5px solid var(--danger); outline-offset:3px; border-radius:8px; }
+  .field.invalid .error-msg{ display:block; }
+
+  /* Success screen */
+  #successScreen{ display:none; text-align:center; padding:50px 20px; }
+  #successScreen .icon{ font-size:52px; }
+  #successScreen h1{ color:var(--navy-dark); margin-top:10px; }
+  #successScreen p{ color:var(--muted); max-width:46ch; margin:8px auto 0; }
+  #successScreen .ref{ display:inline-block; margin-top:16px; background:#EAF1FA; color:var(--navy); font-weight:700; padding:8px 16px; border-radius:8px; font-size:13.5px; }
+
+  .submit-error{ display:none; background:#FDEDED; border:1.5px solid #F3C6C6; color:#9A2C2C; padding:12px 14px; border-radius:9px; font-size:13.5px; margin-top:16px; }
+
+  .spinner{ display:inline-block; width:15px; height:15px; border:2px solid rgba(255,255,255,.4); border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite; margin-right:8px; vertical-align:-2px; }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  footer{ text-align:center; color:var(--muted); font-size:12px; margin-top:34px; }
+
+  /* Honeypot */
+  .hp{ position:absolute; left:-9999px; opacity:0; height:0; overflow:hidden; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+      <path d="M30 4 C22 10 18 20 18 32 L20 46 L30 40 L40 46 L42 32 C42 20 38 10 30 4 Z" fill="#fff" stroke="#F5821F" stroke-width="2.4"/>
+      <circle cx="30" cy="22" r="6" fill="#1F5C99" stroke="#F5821F" stroke-width="2"/>
+      <path d="M18 30 L8 40 L16 38 Z" fill="#1F5C99"/>
+      <path d="M42 30 L52 40 L44 38 Z" fill="#1F5C99"/>
+      <path d="M24 44 L20 56 L27 46 Z" fill="#1F5C99"/>
+      <path d="M36 44 L40 56 L33 46 Z" fill="#1F5C99"/>
+    </svg>
+    <div>
+      <div class="brand-text">SPACE<span>KIDZ</span></div>
+      <div class="tag">Selective Play And Child Education</div>
+    </div>
+  </div>
+
+  <div class="hero">
+    <h1>Preschool Online Enrolment</h1>
+    <p>Complete your child's enrolment paper-free. This form takes about 10–15 minutes — have your ID numbers, medical aid details, and any documents you'd like to upload on hand before you start.</p>
+    <p style="font-size:12.5px; color:var(--navy); font-weight:600; margin-top:10px;">Fields marked <span class="req">*</span> are required and must be completed to submit your enrolment.</p>
+  </div>
+
+  <form id="enrolForm" novalidate>
+  <div class="hp"><label>Leave this field empty</label><input type="text" name="website" tabindex="-1" autocomplete="off"></div>
+
+  <div class="rail">
+    <div class="rail-track"></div>
+    <div class="rail-fill" id="railFill" style="width:0%"></div>
+    <div class="rail-steps" id="railSteps"></div>
+  </div>
+
+  <div class="card">
+
+    <!-- STEP 1: CHILD -->
+    <section class="step active" data-step="1">
+      <h2>👶 Child's Details</h2>
+      <div class="step-sub">Besonderhede van die kind</div>
+      <fieldset>
+        <legend>Basic information</legend>
+        <div class="grid">
+          <div class="field"><label>Full Name(s) <span class="req">*</span></label><input type="text" name="child_first" required></div>
+          <div class="field"><label>Surname <span class="req">*</span></label><input type="text" name="child_surname" required></div>
+        </div>
+        <div class="grid cols-3">
+          <div class="field"><label>Date of Birth <span class="req">*</span></label><input type="date" name="child_dob" required></div>
+          <div class="field"><label>Gender <span class="req">*</span></label>
+            <select name="child_gender" required><option value="">Select…</option><option>Male</option><option>Female</option></select>
+          </div>
+          <div class="field"><label>ID Number / Birth Certificate Number <span class="req">*</span></label><input type="text" name="child_id" required></div>
+        </div>
+        <div class="grid cols-3">
+          <div class="field"><label>Requested first day of school <span class="req">*</span></label><input type="date" name="child_startdate" required></div>
+          <div class="field"><label>Home Language</label><input type="text" name="child_language"></div>
+          <div class="field"><label>Religion</label><input type="text" name="child_religion"></div>
+        </div>
+      </fieldset>
+    </section>
+
+    <!-- STEP 2: PARENTS -->
+    <section class="step" data-step="2">
+      <h2>👨‍👩‍👧 Parent / Guardian Details</h2>
+      <div class="step-sub">At least one parent/guardian's details are required.</div>
+
+      <fieldset>
+        <legend>Mother / Guardian</legend>
+        <div class="grid">
+          <div class="field"><label>Full Name & Surname <span class="req">*</span></label><input type="text" name="mother_name" required></div>
+          <div class="field"><label>ID Number <span class="req">*</span></label><input type="text" name="mother_id" required></div>
+        </div>
+        <div class="grid">
+          <div class="field"><label>Cell Number <span class="req">*</span></label><input type="tel" name="mother_cell" required></div>
+          <div class="field"><label>Email <span class="req">*</span></label><input type="email" name="mother_email" required></div>
+        </div>
+        <div class="grid">
+          <div class="field"><label>Physical Address <span class="req">*</span></label><textarea name="mother_address" required></textarea></div>
+          <div class="field"><label>Postal Address</label><textarea name="mother_postal"></textarea></div>
+        </div>
+        <div class="grid cols-3">
+          <div class="field"><label>Occupation</label><input type="text" name="mother_occupation"></div>
+          <div class="field"><label>Employer</label><input type="text" name="mother_employer"></div>
+          <div class="field"><label>Work Number</label><input type="tel" name="mother_work_phone"></div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Father / Guardian</legend>
+        <div class="grid">
+          <div class="field"><label>Full Name & Surname</label><input type="text" name="father_name"></div>
+          <div class="field"><label>ID Number</label><input type="text" name="father_id"></div>
+        </div>
+        <div class="grid">
+          <div class="field"><label>Cell Number</label><input type="tel" name="father_cell"></div>
+          <div class="field"><label>Email</label><input type="email" name="father_email"></div>
+        </div>
+        <div class="grid">
+          <div class="field"><label>Physical Address</label><textarea name="father_address"></textarea></div>
+          <div class="field"><label>Postal Address</label><textarea name="father_postal"></textarea></div>
+        </div>
+        <div class="grid cols-3">
+          <div class="field"><label>Occupation</label><input type="text" name="father_occupation"></div>
+          <div class="field"><label>Employer</label><input type="text" name="father_employer"></div>
+          <div class="field"><label>Work Number</label><input type="tel" name="father_work_phone"></div>
+        </div>
+      </fieldset>
+    </section>
+
+    <!-- STEP 3: PICKUP + EMERGENCY -->
+    <section class="step" data-step="3">
+      <h2>🚗 Collection & Emergency Contact</h2>
+      <div class="step-sub">Wie mag julle kind optel?</div>
+
+      <fieldset>
+        <legend>Who else is allowed to fetch your child?</legend>
+        <div id="pickupList"></div>
+        <button type="button" class="add-btn" id="addPickup">+ Add another person</button>
+      </fieldset>
+
+      <fieldset>
+        <legend>Emergency contact (if both parents are unavailable)</legend>
+        <div class="grid">
+          <div class="field"><label>Name and Surname <span class="req">*</span></label><input type="text" name="emerg_name" required></div>
+          <div class="field"><label>Relationship to Child <span class="req">*</span></label><input type="text" name="emerg_relationship" required></div>
+        </div>
+        <div class="grid">
+          <div class="field"><label>Contact Number <span class="req">*</span></label><input type="tel" name="emerg_contact" required></div>
+          <div class="field"><label>Physical Address</label><input type="text" name="emerg_address"></div>
+        </div>
+      </fieldset>
+    </section>
+
+    <!-- STEP 4: MEDICAL -->
+    <section class="step" data-step="4">
+      <h2>🩺 Medical & Health History</h2>
+      <div class="step-sub">Mediese besonderhede</div>
+
+      <fieldset>
+        <legend>Medical details</legend>
+        <div class="grid">
+          <div class="field"><label>Paediatrician / Doctor's name <span class="req">*</span></label><input type="text" name="doctor_name" required></div>
+          <div class="field"><label>Doctor's contact number <span class="req">*</span></label><input type="tel" name="doctor_contact" required></div>
+        </div>
+        <div class="grid">
+          <div class="field"><label>Medical Aid Name</label><input type="text" name="medaid_name"></div>
+          <div class="field"><label>Medical Aid Number</label><input type="text" name="medaid_number"></div>
+        </div>
+        <div class="field"><label>Are your child's immunisations up to date? <span class="req">*</span></label>
+          <select name="immunised" required><option value="">Select…</option><option>Yes</option><option>No</option></select>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Birth details</legend>
+        <div class="grid cols-3">
+          <div class="field"><label>Length of pregnancy</label><input type="text" name="birth_length" placeholder="e.g. 39 weeks"></div>
+          <div class="field"><label>Weight at birth</label><input type="text" name="birth_weight" placeholder="e.g. 3.2kg"></div>
+          <div class="field"><label>Type of birth</label>
+            <select name="birth_type"><option value="">Select…</option><option>Natural</option><option>Instrument</option><option>Caesarean</option></select>
+          </div>
+        </div>
+        <div class="field"><label>Complications during birth / developmental issues (if any)</label><textarea name="birth_notes"></textarea></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Previous illnesses / conditions — tick all that apply</legend>
+        <div class="check-grid">
+          <div class="check-row"><input type="checkbox" name="ill_measles" id="ill_measles"><label for="ill_measles">Measles</label></div>
+          <div class="check-row"><input type="checkbox" name="ill_throat" id="ill_throat"><label for="ill_throat">Throat & nose infections</label></div>
+          <div class="check-row"><input type="checkbox" name="ill_chickenpox" id="ill_chickenpox"><label for="ill_chickenpox">Chickenpox</label></div>
+          <div class="check-row"><input type="checkbox" name="ill_ear" id="ill_ear"><label for="ill_ear">Ear infections</label></div>
+          <div class="check-row"><input type="checkbox" name="ill_mumps" id="ill_mumps"><label for="ill_mumps">Mumps</label></div>
+          <div class="check-row"><input type="checkbox" name="ill_asthma" id="ill_asthma"><label for="ill_asthma">Asthma</label></div>
+          <div class="check-row"><input type="checkbox" name="ill_scarlet" id="ill_scarlet"><label for="ill_scarlet">Scarlet fever</label></div>
+          <div class="check-row"><input type="checkbox" name="ill_hayfever" id="ill_hayfever"><label for="ill_hayfever">Hay fever</label></div>
+          <div class="check-row"><input type="checkbox" name="ill_german" id="ill_german"><label for="ill_german">German measles</label></div>
+          <div class="check-row"><input type="checkbox" name="ill_diphtheria" id="ill_diphtheria"><label for="ill_diphtheria">Diphtheria</label></div>
+          <div class="check-row"><input type="checkbox" name="ill_tonsillectomy" id="ill_tonsillectomy"><label for="ill_tonsillectomy">Tonsillectomy</label></div>
+          <div class="check-row"><input type="checkbox" name="ill_circumcision" id="ill_circumcision"><label for="ill_circumcision">Circumcision</label></div>
+        </div>
+        <div class="field" style="margin-top:10px;"><label>Allergies (please list)</label><input type="text" name="ill_allergies"></div>
+        <div class="field"><label>Diagnosed conditions — ADHD, ADD, Autism, Asperger's, speech/hearing delays, other</label><input type="text" name="ill_diagnosed"></div>
+      </fieldset>
+
+      <div class="consent-block">
+        <div class="check-row">
+          <input type="checkbox" name="medical_consent" id="medical_consent" required>
+          <label for="medical_consent">I/we agree for my child to receive necessary medical attention if I/we are unavailable, in the case of an emergency. <span class="req">*</span></label>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 5: AGREEMENT -->
+    <section class="step" data-step="5">
+      <h2>📄 Enrolment & Indemnity Agreement</h2>
+      <div class="step-sub">Please read the full agreement below before accepting.</div>
+
+      <div class="agreement-box" id="agreementBox">
+        <h3>1. Acknowledgement & Acceptance</h3>
+        <p><span class="clause-num">1.1</span> The Parent(s)/Guardian(s) accept and agree to abide by all rules, regulations, and conditions of the School, with which they declare themselves fully acquainted.</p>
+        <p><span class="clause-num">1.2</span> The School and its employees will care for the child to the best of their ability but will not accept liability for any accident, injury, loss, or damages arising while the child attends the School, except in cases of gross negligence or wilful misconduct.</p>
+        <p><span class="clause-num">1.3</span> The Parent(s)/Guardian(s) indemnify the School and its employees against any claims that may arise or be instituted in respect of the child, save where South African law provides otherwise.</p>
+
+        <h3>2. Health & Medical</h3>
+        <p><span class="clause-num">2.1</span> The Parent(s)/Guardian(s) confirm the child has been properly immunised against Whooping Cough, Diphtheria, Tetanus, Polio, and Tuberculosis, and will provide proof on request.</p>
+        <p><span class="clause-num">2.2</span> In an emergency, the School supervisor or another responsible person is authorised to consent to medical treatment or surgery for the child, under the supervision of a medical doctor.</p>
+        <p><span class="clause-num">2.3</span> The Parent(s)/Guardian(s) accept responsibility for all medical expenses incurred.</p>
+
+        <h3>3. Illness & Exclusion Policy</h3>
+        <p><span class="clause-num">3.1</span> A child with a fever, vomiting, diarrhoea, or symptoms of a contagious illness or unexplained rash may not attend the School.</p>
+        <p><span class="clause-num">3.2</span> A child sent home due to illness must be fever-free (without fever-reducing medication) and symptom-free for a minimum of 24 hours before returning.</p>
+        <p><span class="clause-num">3.3</span> The School may send a child home who becomes ill at School; reasonable additional transport/supervision costs may be recovered from the Parent(s)/Guardian(s).</p>
+        <p><span class="clause-num">3.4</span> Fees remain payable in full during any period of exclusion due to illness.</p>
+
+        <h3>4. Behaviour, Discipline & Parent Cooperation</h3>
+        <p><span class="clause-num">4.1</span> The School follows a structured, age-appropriate discipline system to guide and encourage well-behaved conduct and help each child follow the School's and classroom's rules.</p>
+        <div class="highlight">
+          <p style="margin:0 0 4px;"><strong>In practice, this includes:</strong></p>
+          <ul>
+            <li>A calm, brief time-out (no playtime), explained to the child, matched to the child's age in minutes.</li>
+            <li>A rewards chart — children earn stars for good behaviour, helping others, completing work, and following instructions.</li>
+            <li>A star may be removed for correction; if none remain, a further brief time-out applies and ends once complete.</li>
+            <li>10 stars earns a small reward, after which the chart resets.</li>
+            <li>Discipline always leads with positive reinforcement, is age-appropriate, and is never physical or harsh.</li>
+          </ul>
+        </div>
+        <p><span class="clause-num">4.2</span> Where a child displays disruptive or unsafe behaviour, the School will always try to manage this internally first, before contacting the Parent(s)/Guardian(s).</p>
+        <p><span class="clause-num">4.3</span> If informed of disruptive behaviour, the Parent(s)/Guardian(s) agree to cooperate fully with the School, and not to hold the School, its teachers, or staff responsible, given the consistent system applied to all learners.</p>
+        <p><span class="clause-num">4.4</span> Children may not, under any circumstances, physically or verbally abuse teachers, staff, or other children, or damage School property. Abusive conduct by a Parent/Guardian toward staff or other children will also not be tolerated.</p>
+        <p><span class="clause-num">4.5</span> Should disruptive behaviour persist, or a Parent/Guardian behave as described above, the School may require the child's permanent removal — <strong>with no refund of any fees paid, under any circumstances.</strong></p>
+
+        <h3>5. Fees & Payment</h3>
+        <p><span class="clause-num">5.1</span> A non-refundable registration fee of R900 is payable upon enrolment.</p>
+        <p><span class="clause-num">5.2</span> Monthly tuition fees are payable in advance by the last day of the preceding month.</p>
+        <p><span class="clause-num">5.3</span> Payments received after the 5th of the month attract an automatic R220 late-payment penalty.</p>
+        <p><span class="clause-num">5.4</span> Non-payment may result in suspension of services and/or legal action to recover amounts owed.</p>
+        <p><span class="clause-num">5.5</span> Fees remain payable regardless of absence, and during the December closure period (payable in advance, deductible from annual totals but not refundable).</p>
+        <div class="highlight">
+          <p><span class="clause-num">5.6</span> Should any account become overdue and be handed over for collection, the Parent(s)/Guardian(s) agree to be liable for all collection costs, tracing fees, commission charged by the debt collection agency (<strong>Accountability</strong>, the School's appointed agent), legal costs on the attorney-and-client scale where applicable, and interest on overdue amounts at the maximum rate permitted by law under the Prescribed Rate of Interest Act 55 of 1975. These costs are added to and payable as part of the outstanding account, in addition to the amount originally owed.</p>
+        </div>
+        <p><span class="clause-num">5.7</span> Fees may be reviewed annually at the School's discretion, with a minimum of 30 days' written notice before any increase takes effect. A sibling or other discount may be offered at the School's sole discretion and is not a guaranteed entitlement unless confirmed in writing.</p>
+
+        <h3>6. Operating Hours, Holidays & Late Collection</h3>
+        <p>Monday–Thursday 06:15–17:30, Friday 06:15–17:00. Closed on all SA public holidays (plus the adjoining Monday/Friday where a holiday falls on a Tuesday/Thursday). The School generally closes around 15 December and reopens the first week of January. A late collection fee of R100 per half hour (or part thereof) applies after closing time.</p>
+
+        <h3>7. Termination of Enrolment</h3>
+        <p>One full calendar month's written notice is required. No withdrawal notices are accepted for October, November, or December. Failure to give notice results in liability for one month's fees in lieu of notice.</p>
+
+        <h3>8. Participation in School Events</h3>
+        <p>A child may not participate in the year-end concert or graduation ceremony if fees are outstanding, or if enrolment ends in November without proper notice.</p>
+
+        <h3>9. Photography & Social Media Consent</h3>
+        <p><span class="clause-num">9.1</span> The School may photograph/video children during activities for its own records, classroom displays, and promotional material including its website and social media.</p>
+        <p><span class="clause-num">9.2</span> The School will not publish a child's full name alongside their photograph without separate written consent.</p>
+
+        <h3>10. POPIA Compliance</h3>
+        <p>The Parent(s)/Guardian(s) consent to the School collecting and processing their and their child's personal information, in accordance with POPIA, for enrolment, administration, and communication purposes.</p>
+
+        <h3>11. General</h3>
+        <p>This Agreement is binding on both parties and their successors, governed by the laws of the Republic of South Africa. Amendments must be in writing and signed by both the School and the Parent(s)/Guardian(s).</p>
+      </div>
+
+      <div class="consent-block" style="margin-top:16px;">
+        <div class="check-row">
+          <input type="checkbox" name="agree_all" id="agree_all" required>
+          <label for="agree_all"><strong>I/we have read, understood, and agree to the full Enrolment & Indemnity Agreement above</strong>, including the Behaviour & Discipline policy (Section 4) and Fees & Payment terms (Section 5). <span class="req">*</span></label>
+        </div>
+      </div>
+
+      <div class="consent-block">
+        <div class="check-row">
+          <input type="checkbox" name="agree_behaviour" id="agree_behaviour" required>
+          <label for="agree_behaviour">I/we specifically acknowledge Section 4 (Behaviour, Discipline & Parent Cooperation) and agree to cooperate with the School's discipline process. <span class="req">*</span></label>
+        </div>
+      </div>
+
+      <fieldset style="margin-top:16px;">
+        <legend>Photography & social media consent (Section 9)</legend>
+        <div class="check-row"><input type="radio" name="photo_consent" value="Yes" id="photo_yes" required><label for="photo_yes">Yes — I/we consent to my child's photo/video being used as described.</label></div>
+        <div class="check-row"><input type="radio" name="photo_consent" value="No" id="photo_no"><label for="photo_no">No — I/we do NOT consent.</label></div>
+      </fieldset>
+    </section>
+
+    <!-- STEP 6: DOCUMENTS -->
+    <section class="step" data-step="6">
+      <h2>📎 Supporting Documents</h2>
+      <div class="step-sub">Optional here — you can also email these later. Accepted: PDF, JPG, PNG (max ~5MB each).</div>
+
+      <div class="file-row"><div><div class="file-name">Child's birth certificate</div><div class="file-status" data-status="birth_cert">Not uploaded</div></div><input type="file" data-field="birth_cert" accept=".pdf,.jpg,.jpeg,.png"></div>
+      <div class="file-row"><div><div class="file-name">Parent ID(s) / passport(s)</div><div class="file-status" data-status="parent_id">Not uploaded</div></div><input type="file" data-field="parent_id" accept=".pdf,.jpg,.jpeg,.png" multiple></div>
+      <div class="file-row"><div><div class="file-name">Proof of address</div><div class="file-status" data-status="proof_address">Not uploaded</div></div><input type="file" data-field="proof_address" accept=".pdf,.jpg,.jpeg,.png"></div>
+      <div class="file-row"><div><div class="file-name">Vaccination record</div><div class="file-status" data-status="vaccination">Not uploaded</div></div><input type="file" data-field="vaccination" accept=".pdf,.jpg,.jpeg,.png"></div>
+      <div class="file-row"><div><div class="file-name">Medical aid card</div><div class="file-status" data-status="medaid_card">Not uploaded</div></div><input type="file" data-field="medaid_card" accept=".pdf,.jpg,.jpeg,.png"></div>
+      <div class="file-row"><div><div class="file-name">Proof of fees paid (previous school)</div><div class="file-status" data-status="prev_fees">Not uploaded</div></div><input type="file" data-field="prev_fees" accept=".pdf,.jpg,.jpeg,.png"></div>
+      <div class="file-row"><div><div class="file-name">Latest report card (if applicable)</div><div class="file-status" data-status="report_card">Not uploaded</div></div><input type="file" data-field="report_card" accept=".pdf,.jpg,.jpeg,.png"></div>
+    </section>
+
+    <!-- STEP 7: SIGN & SUBMIT -->
+    <section class="step" data-step="7">
+      <h2>✍️ Signatures</h2>
+      <div class="step-sub">By signing below, you confirm everything entered is accurate and that you accept the Agreement in Section 5.</div>
+
+      <fieldset>
+        <legend>Mother / Guardian signature</legend>
+        <div class="field"><label>Type full name as signature confirmation <span class="req">*</span></label><input type="text" name="mother_sign_name" required></div>
+        <label>Draw your signature <span class="req">*</span></label>
+        <div class="sig-wrap"><canvas class="sigpad" id="sigMother"></canvas>
+          <div class="sig-tools"><span class="sig-hint">Sign with your mouse or finger</span><button type="button" data-clear="sigMother">Clear</button></div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Father / Guardian signature (if applicable)</legend>
+        <div class="field"><label>Type full name as signature confirmation</label><input type="text" name="father_sign_name"></div>
+        <label>Draw your signature</label>
+        <div class="sig-wrap"><canvas class="sigpad" id="sigFather"></canvas>
+          <div class="sig-tools"><span class="sig-hint">Sign with your mouse or finger</span><button type="button" data-clear="sigFather">Clear</button></div>
+        </div>
+      </fieldset>
+
+      <div class="field"><label>Date</label><input type="text" id="signDate" disabled></div>
+
+      <div class="submit-error" id="submitError"></div>
+    </section>
+
+    <div class="nav-row">
+      <button type="button" class="btn btn-ghost" id="btnBack">← Back</button>
+      <button type="button" class="btn btn-primary" id="btnNext">Next →</button>
+      <button type="button" class="btn btn-submit" id="btnSubmit" style="display:none;">Submit Enrolment</button>
+    </div>
+  </div>
+  </form>
+
+  <div id="successScreen">
+    <div class="icon">🚀</div>
+    <h1>Enrolment received!</h1>
+    <p>Thank you — your child's enrolment form has been submitted to SpaceKidz Preschool. We'll be in touch shortly to confirm the next steps.</p>
+    <div class="ref" id="refNumber"></div>
+  </div>
+
+  <footer>SpaceKidz (Pty) Ltd · 7 Cathkin Street, Ravenswood, Boksburg · spacekidzschool@gmail.com</footer>
+</div>
+
+<script>
+/* ====== CONFIG ====== */
+// Paste the Google Apps Script Web App URL here after deploying (see setup guide).
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwSClLSiv-28snH9915D_EYX-lfBqp1P0wqb601UY3vDfGVWPsDLOeK-_DCxzGDB2Lm/exec";
+
+/* ====== STEP NAVIGATION ====== */
+const steps = Array.from(document.querySelectorAll('.step'));
+const stepLabels = ["Child","Parents","Pickup","Medical","Agreement","Documents","Sign"];
+let current = 0;
+
+const railSteps = document.getElementById('railSteps');
+steps.forEach((s,i)=>{
+  const d = document.createElement('div');
+  d.className = 'rail-step' + (i===0?' active':'');
+  d.innerHTML = `<div class="rail-dot">${i+1}</div><div class="rail-label">${stepLabels[i]}</div>`;
+  railSteps.appendChild(d);
+});
+const railFill = document.getElementById('railFill');
+
+function updateRail(){
+  document.querySelectorAll('.rail-step').forEach((el,i)=>{
+    el.classList.toggle('active', i===current);
+    el.classList.toggle('done', i<current);
+  });
+  railFill.style.width = (current/(steps.length-1))*100 + '%';
+}
+
+function showStep(i){
+  steps.forEach((s,idx)=> s.classList.toggle('active', idx===i));
+  document.getElementById('btnBack').style.visibility = i===0 ? 'hidden' : 'visible';
+  document.getElementById('btnNext').style.display = i===steps.length-1 ? 'none' : 'inline-block';
+  document.getElementById('btnSubmit').style.display = i===steps.length-1 ? 'inline-block' : 'none';
+  updateRail();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function clearFieldError(wrap){
+  if(!wrap) return;
+  wrap.classList.remove('invalid');
+  const msg = wrap.querySelector('.error-msg');
+  if(msg) msg.remove();
+}
+function showFieldError(wrap, text){
+  if(!wrap) return;
+  wrap.classList.add('invalid');
+  let msg = wrap.querySelector('.error-msg');
+  if(!msg){
+    msg = document.createElement('div');
+    msg.className = 'error-msg';
+    wrap.appendChild(msg);
+  }
+  msg.textContent = text;
+  msg.style.display = 'block';
+}
+
+function validateStep(i){
+  let valid = true;
+  let firstInvalid = null;
+  const fields = steps[i].querySelectorAll('input[required], select[required], textarea[required]');
+  const seenGroups = new Set();
+
+  fields.forEach(f=>{
+    if(f.type === 'radio'){
+      if(seenGroups.has(f.name)) return;
+      seenGroups.add(f.name);
+    }
+    const wrap = f.closest('.field') || f.closest('.consent-block') || f.closest('.check-row') || f.closest('fieldset');
+    let ok = true;
+    if(f.type==='checkbox') ok = f.checked;
+    else if(f.type==='radio') ok = steps[i].querySelector(`input[name="${f.name}"]:checked`) !== null;
+    else ok = f.value.trim() !== '';
+
+    if(!ok){
+      valid = false;
+      showFieldError(wrap, f.type==='checkbox' || f.type==='radio' ? 'Please make a selection to continue.' : 'This field is required.');
+      if(!firstInvalid) firstInvalid = wrap;
+    } else {
+      clearFieldError(wrap);
+    }
+  });
+
+  // signature check on last step
+  if(i === steps.length-1){
+    const sigWrap = document.getElementById('sigMother').closest('.sig-wrap');
+    if(isCanvasBlank(sigCanvases.sigMother)){
+      valid = false;
+      sigWrap.style.outline = '2px solid var(--danger)';
+      sigWrap.style.borderRadius = '10px';
+      if(!firstInvalid) firstInvalid = sigWrap;
+    } else {
+      sigWrap.style.outline = '';
+    }
+  }
+
+  if(firstInvalid){
+    firstInvalid.scrollIntoView({ behavior:'smooth', block:'center' });
+  }
+  return valid;
+}
+
+document.getElementById('btnNext').addEventListener('click', ()=>{
+  if(!validateStep(current)){ return; }
+  if(current < steps.length-1){ current++; showStep(current); }
+});
+document.getElementById('btnBack').addEventListener('click', ()=>{
+  if(current > 0){ current--; showStep(current); }
+});
+showStep(0);
+
+/* ====== REPEATING PICKUP PERSON BLOCKS ====== */
+const pickupList = document.getElementById('pickupList');
+let pickupCount = 0;
+function addPickupBlock(){
+  pickupCount++;
+  const idx = pickupCount;
+  const div = document.createElement('div');
+  div.className = 'repeat-block';
+  div.innerHTML = `
+    ${idx>1 ? '<button type="button" class="rm" data-rm="'+idx+'">Remove</button>' : ''}
+    <div class="grid cols-3">
+      <div class="field"><label>Name and Surname</label><input type="text" name="pickup_name_${idx}"></div>
+      <div class="field"><label>Relationship to Child</label><input type="text" name="pickup_rel_${idx}"></div>
+      <div class="field"><label>Contact Number</label><input type="tel" name="pickup_contact_${idx}"></div>
+    </div>`;
+  pickupList.appendChild(div);
+}
+addPickupBlock();
+document.getElementById('addPickup').addEventListener('click', ()=>{ if(pickupCount<4) addPickupBlock(); else alert('Maximum 4 people.'); });
+pickupList.addEventListener('click', (e)=>{
+  if(e.target.dataset.rm){ e.target.closest('.repeat-block').remove(); }
+});
+
+/* ====== SIGNATURE PADS ====== */
+const sigCanvases = {};
+function setupSignaturePad(id){
+  const canvas = document.getElementById(id);
+  const ctx = canvas.getContext('2d');
+  function resize(){
+    const ratio = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * ratio;
+    canvas.height = rect.height * ratio;
+    ctx.scale(ratio, ratio);
+    ctx.lineWidth = 2; ctx.lineCap='round'; ctx.strokeStyle = '#1E2430';
+  }
+  resize();
+  let drawing = false, last = null;
+  function pos(e){
+    const rect = canvas.getBoundingClientRect();
+    const p = e.touches ? e.touches[0] : e;
+    return { x: p.clientX - rect.left, y: p.clientY - rect.top };
+  }
+  function start(e){ drawing = true; last = pos(e); e.preventDefault(); }
+  function move(e){
+    if(!drawing) return;
+    const p = pos(e);
+    ctx.beginPath(); ctx.moveTo(last.x,last.y); ctx.lineTo(p.x,p.y); ctx.stroke();
+    last = p; e.preventDefault();
+  }
+  function end(){ drawing = false; }
+  canvas.addEventListener('mousedown', start); canvas.addEventListener('mousemove', move); window.addEventListener('mouseup', end);
+  canvas.addEventListener('touchstart', start, {passive:false}); canvas.addEventListener('touchmove', move, {passive:false}); canvas.addEventListener('touchend', end);
+  sigCanvases[id] = canvas;
+}
+['sigMother','sigFather'].forEach(setupSignaturePad);
+document.querySelectorAll('[data-clear]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const c = document.getElementById(btn.dataset.clear);
+    c.getContext('2d').clearRect(0,0,c.width,c.height);
+  });
+});
+function isCanvasBlank(canvas){
+  const ctx = canvas.getContext('2d');
+  const data = ctx.getImageData(0,0,canvas.width,canvas.height).data;
+  for(let i=3;i<data.length;i+=4){ if(data[i] !== 0) return false; }
+  return true;
+}
+
+document.getElementById('signDate').value = new Date().toLocaleDateString('en-ZA', {year:'numeric',month:'long',day:'numeric'});
+
+/* ====== FILE UPLOADS -> base64 ====== */
+const uploadedFiles = {}; // field -> [{name,type,data}]
+document.querySelectorAll('input[type=file]').forEach(input=>{
+  input.addEventListener('change', async ()=>{
+    const field = input.dataset.field;
+    const statusEl = document.querySelector(`[data-status="${field}"]`);
+    const files = Array.from(input.files);
+    if(!files.length){ return; }
+    let totalMB = files.reduce((s,f)=>s+f.size,0)/1024/1024;
+    if(totalMB > 8){
+      statusEl.textContent = 'Too large — please email this document instead';
+      statusEl.style.color = 'var(--danger)';
+      return;
+    }
+    statusEl.textContent = 'Processing…';
+    const results = [];
+    for(const f of files){
+      const data = await fileToBase64(f);
+      results.push({name:f.name, type:f.type, data});
+    }
+    uploadedFiles[field] = results;
+    statusEl.textContent = `${files.length} file(s) ready ✓`;
+    statusEl.style.color = 'var(--green)';
+  });
+});
+function fileToBase64(file){
+  return new Promise((resolve,reject)=>{
+    const reader = new FileReader();
+    reader.onload = ()=> resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+/* ====== SUBMIT ====== */
+document.getElementById('btnSubmit').addEventListener('click', async ()=>{
+  if(!validateStep(current)){ return; }
+  if(document.querySelector('.hp input').value){ return; } // honeypot triggered — silently stop
+
+  const btn = document.getElementById('btnSubmit');
+  const errBox = document.getElementById('submitError');
+  errBox.style.display = 'none';
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Submitting…';
+
+  const formData = new FormData(document.getElementById('enrolForm'));
+  const payload = {};
+  formData.forEach((v,k)=>{ payload[k]=v; });
+
+  payload.pickup_count = pickupCount;
+  payload.signature_mother = sigCanvases.sigMother.toDataURL('image/png');
+  payload.signature_father = isCanvasBlank(sigCanvases.sigFather) ? '' : sigCanvases.sigFather.toDataURL('image/png');
+  payload.sign_date = document.getElementById('signDate').value;
+  payload.attachments = uploadedFiles;
+  payload.submitted_at = new Date().toISOString();
+
+  try{
+    const res = await fetch(SCRIPT_URL, {
+      method:'POST',
+      headers:{'Content-Type':'text/plain;charset=utf-8'}, // avoids CORS preflight on Apps Script
+      body: JSON.stringify(payload)
+    });
+    const result = await res.json();
+    if(result.status === 'ok'){
+      document.getElementById('enrolForm').style.display = 'none';
+      document.querySelector('.rail').style.display = 'none';
+      document.getElementById('successScreen').style.display = 'block';
+      document.getElementById('refNumber').textContent = 'Reference: ' + result.ref;
+      window.scrollTo({top:0, behavior:'smooth'});
+    } else {
+      throw new Error(result.message || 'Unknown error');
+    }
+  } catch(err){
+    errBox.style.display = 'block';
+    errBox.textContent = 'Something went wrong submitting your form (' + err.message + '). Please try again, or email spacekidzschool@gmail.com directly.';
+    btn.disabled = false;
+    btn.textContent = 'Submit Enrolment';
+  }
+});
+</script>
+</body>
+</html>
